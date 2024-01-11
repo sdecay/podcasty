@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"log"
 	"net/http"
 	"os"
@@ -8,7 +9,15 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
 	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
+	"github.com/sdecay/podcasty/internal/database"
 )
+
+type apiConfig struct {
+	DB         *database.Queries
+	serverPort string
+	dbUrl      string
+}
 
 func loadEnvironment() error {
 	err := godotenv.Load(".env")
@@ -22,35 +31,46 @@ func setupCors(router *chi.Mux) {
 		AllowedHeaders:   []string{"*"},
 		ExposedHeaders:   []string{"Link"},
 		AllowCredentials: false,
-		MaxAge:           300,
+		MaxAge:           30,
 	}))
 }
 
 func main() {
+	config := apiConfig{}
+
 	err := loadEnvironment()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	port := os.Getenv("PORT")
-	router := chi.NewRouter()
+	config.serverPort = os.Getenv("PORT")
+	config.dbUrl = os.Getenv("DB_URL")
 
+	conn, err := sql.Open("postgres", config.dbUrl)
+	if err != nil {
+		log.Fatal("Could not connect to db", err)
+	}
+
+	config.DB = database.New(conn)
+
+	router := chi.NewRouter()
 	setupCors(router)
 
 	v1Router := chi.NewRouter()
 
 	v1Router.Get("/health", handlerReady)
 	v1Router.Get("/error", handlerError)
+	v1Router.Post("/users", config.handlerCreateUser)
 
 	router.Mount("/v1", v1Router)
 
 	server := &http.Server{
 		Handler: router,
-		Addr:    ":" + port,
+		Addr:    ":" + config.serverPort,
 	}
 
 	// add IP addr from utils.go
-	log.Printf("Listening on port %s\n", port)
+	log.Printf("Listening at %s:%s\n", GetLocalIP(), config.serverPort)
 
 	err = server.ListenAndServe()
 	if err != nil {

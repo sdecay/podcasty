@@ -7,7 +7,7 @@ import (
 
 func respondWithError(writer http.ResponseWriter, code int, msg string) {
 	if code > http.StatusUnavailableForLegalReasons {
-		log.Println("500+ error:", msg)
+		log.Println("Bad Thing error", msg)
 	}
 
 	type errorResponse struct {
@@ -20,5 +20,5 @@ func respondWithError(writer http.ResponseWriter, code int, msg string) {
 }
 
 func handlerReady(writer http.ResponseWriter, req *http.Request) {
-	respondWithJson(writer, http.StatusAccepted, struct{}{})
+	respondWithJson(writer, http.StatusOK, struct{}{})
 }
