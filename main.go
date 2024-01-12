@@ -48,7 +48,7 @@ func main() {
 
 	conn, err := sql.Open("postgres", config.dbUrl)
 	if err != nil {
-		log.Fatal("Could not connect to db", err)
+		log.Fatal("could not connect to db", err)
 	}
 
 	config.DB = database.New(conn)
@@ -61,6 +61,7 @@ func main() {
 	v1Router.Get("/health", handlerReady)
 	v1Router.Get("/error", handlerError)
 	v1Router.Post("/users", config.handlerCreateUser)
+	v1Router.Get("/users", config.middlewareAuth(config.handlerGetUser))
 
 	router.Mount("/v1", v1Router)
 
