@@ -10,13 +10,13 @@ import (
 	"github.com/sdecay/podcasty/internal/database"
 )
 
-func (config *apiConfig) handlerCreateFeed(writer http.ResponseWriter, r *http.Request, user database.User) {
+func (config *apiConfig) handlerCreateFeed(writer http.ResponseWriter, req *http.Request, user database.User) {
 	type parameters struct {
 		Name string `json:"name"`
 		URL  string `json:"url"`
 	}
 
-	decoder := json.NewDecoder(r.Body)
+	decoder := json.NewDecoder(req.Body)
 
 	params := parameters{}
 	err := decoder.Decode(&params)
@@ -25,7 +25,7 @@ func (config *apiConfig) handlerCreateFeed(writer http.ResponseWriter, r *http.R
 		return
 	}
 
-	feed, err := config.DB.CreateFeed(r.Context(), database.CreateFeedParams{
+	feed, err := config.DB.CreateFeed(req.Context(), database.CreateFeedParams{
 		ID:        uuid.New(),
 		CreatedAt: time.Now().UTC(),
 		UpdatedAt: time.Now().UTC(),
@@ -39,4 +39,13 @@ func (config *apiConfig) handlerCreateFeed(writer http.ResponseWriter, r *http.R
 	}
 
 	respondWithJson(writer, http.StatusCreated, dbFeedtoFeed(feed))
+}
+
+func (config *apiConfig) handlerGetFeeds(writer http.ResponseWriter, req *http.Request) {
+	feeds, err := config.DB.GetFeeds(req.Context())
+	if err != nil {
+		respondWithError(writer, http.StatusBadRequest, "could not get feeds")
+	}
+
+	respondWithJson(writer, http.StatusOK, dbFeedstoFeeds(feeds))
 }

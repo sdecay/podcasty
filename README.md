@@ -7,5 +7,3 @@ Following a tutorial because I'm still uncomfortable with the language and best 
 Then I'll do my own thing with it. So far there's a lot I'd change.
 
 _pressly/goose_ is pretty neat and makes things easy compared to when I did database work. Maybe too easy. At least you get to write your own queries. The code generation just kinda weirds me out a bit.
-
-01/11/2024 - Couldn't get a lone done today. Farm chores
