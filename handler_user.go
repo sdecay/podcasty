@@ -10,12 +10,12 @@ import (
 	"github.com/sdecay/podcasty/internal/database"
 )
 
-func (config *apiConfig) handlerCreateUser(writer http.ResponseWriter, r *http.Request) {
+func (config *apiConfig) handlerCreateUser(writer http.ResponseWriter, req *http.Request) {
 	type parameters struct {
 		Name string `json:"name"`
 	}
 
-	decoder := json.NewDecoder(r.Body)
+	decoder := json.NewDecoder(req.Body)
 
 	params := parameters{}
 	err := decoder.Decode(&params)
@@ -24,7 +24,7 @@ func (config *apiConfig) handlerCreateUser(writer http.ResponseWriter, r *http.R
 		return
 	}
 
-	user, err := config.DB.CreateUser(r.Context(), database.CreateUserParams{
+	user, err := config.DB.CreateUser(req.Context(), database.CreateUserParams{
 		ID:        uuid.New(),
 		CreatedAt: time.Now().UTC(),
 		UpdatedAt: time.Now().UTC(),

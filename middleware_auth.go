@@ -10,8 +10,8 @@ import (
 
 type authorizedHandler func(http.ResponseWriter, *http.Request, database.User)
 
-// TODO: get back to this to understand it more
-// also i hate anonymous functions
+// TODO: pass in config instead of method it so i can break handlers out
+// of main
 func (config *apiConfig) middlewareAuth(handler authorizedHandler) http.HandlerFunc {
 	return func(writer http.ResponseWriter, req *http.Request) {
 		apiKey, err := auth.GetAPIKey(req.Header)
