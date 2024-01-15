@@ -62,6 +62,7 @@ func main() {
 	v1Router.Get("/error", handlerError)
 	v1Router.Post("/users", config.handlerCreateUser)
 	v1Router.Get("/users", config.middlewareAuth(config.handlerGetUser))
+	v1Router.Post("/feeds", config.middlewareAuth(config.handlerCreateFeed))
 
 	router.Mount("/v1", v1Router)
 
@@ -70,7 +71,6 @@ func main() {
 		Addr:    ":" + config.serverPort,
 	}
 
-	// add IP addr from utils.go
 	log.Printf("Listening at %s:%s\n", GetLocalIP(), config.serverPort)
 
 	err = server.ListenAndServe()
