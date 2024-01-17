@@ -35,7 +35,15 @@ func setupCors(router *chi.Mux) {
 	}))
 }
 
+// TODO: break it up at some point.  too much shit in here
 func main() {
+	// testes testes 1, 2... 3?
+	// feed, err := UrlToRssFeed("https://www.sevatimassage.com/blog?format=rss")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// fmt.Println(feed)
+
 	config := apiConfig{}
 
 	err := loadEnvironment()
@@ -67,6 +75,8 @@ func main() {
 	v1Router.Post("/feeds", config.middlewareAuth(config.handlerCreateFeed))
 
 	v1Router.Post("/follow", config.middlewareAuth(config.handlerFollowFeed))
+	v1Router.Get("/follow", config.middlewareAuth(config.handlerGetFollowed))
+	v1Router.Delete("/follow/{followID}", config.middlewareAuth(config.handlerDeleteFollow))
 
 	router.Mount("/v1", v1Router)
 

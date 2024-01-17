@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"net/http"
 
-	auth "github.com/sdecay/podcasty/internal"
+	"github.com/sdecay/podcasty/internal/auth"
 	"github.com/sdecay/podcasty/internal/database"
 )
 
 type authorizedHandler func(http.ResponseWriter, *http.Request, database.User)
 
-// TODO: pass in config instead of method it so i can break handlers out
+// TODO: pass in config (or config.DB) instead of method it so i can break handlers out
 // of main
 func (config *apiConfig) middlewareAuth(handler authorizedHandler) http.HandlerFunc {
 	return func(writer http.ResponseWriter, req *http.Request) {

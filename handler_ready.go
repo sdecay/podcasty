@@ -6,8 +6,8 @@ import (
 )
 
 func respondWithError(writer http.ResponseWriter, code int, msg string) {
-	if code > http.StatusUnavailableForLegalReasons {
-		log.Println("Bad Thing error", msg)
+	if code >= http.StatusInternalServerError {
+		log.Println("bad Thing error", msg)
 	}
 
 	type errorResponse struct {

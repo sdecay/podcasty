@@ -10,6 +10,7 @@ import (
 	"github.com/sdecay/podcasty/internal/database"
 )
 
+// TODO: change to parse proper feed name and use that
 func (config *apiConfig) handlerCreateFeed(writer http.ResponseWriter, req *http.Request, user database.User) {
 	type parameters struct {
 		Name string `json:"name"`

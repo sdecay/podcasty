@@ -6,7 +6,6 @@ import (
 	"strings"
 )
 
-// change to use respondWithError
 func GetAPIKey(headers http.Header) (string, error) {
 	h := headers.Get("Authorization")
 	if h == "" {
@@ -20,10 +19,4 @@ func GetAPIKey(headers http.Header) (string, error) {
 	}
 
 	return vals[1], nil
-
-	// if len(vals[1]) == 64 {
-	// 	return vals[1], nil
-	// }
-	//
-	// return "", errors.New("Malformed auth header")
 }
