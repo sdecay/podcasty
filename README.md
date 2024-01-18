@@ -13,3 +13,6 @@ _pressly/goose_ is pretty neat and makes things easy compared to when I did data
 **01/17/2024**
 I have no idea where _sqlc-dev/sqlc_ is getting its magic values from but I haven't done anything but skim the docs because I can't read. Still kinda like it.
 Also, concurrency time! Hope this is easier than silly pthreads.
+
+**01/18/2024**
+Mostly done with the tutorial bit so I'm turning the spaghetti into whatever is different from spaghetti, and making the thing more purpose built for what I would like to do with it.

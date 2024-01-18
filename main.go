@@ -14,18 +14,21 @@ import (
 	"github.com/sdecay/podcasty/internal/database"
 )
 
+// TODO: cap
 type apiConfig struct {
-	DB         *database.Queries
-	serverPort string
-	maxThreads int
-	dbUrl      string
+	DB               *database.Queries
+	serverPort       string
+	scrapeMaxThreads int
+	dbUrl            string
+	scrapeDelay      time.Duration
 }
 
 func loadEnvironment() error {
-	err := godotenv.Load(".env")
-	return err
+	return godotenv.Load(".env")
 }
 
+// cors is something i'm not looking forward to learning about.
+// seems dreadful.
 func setupCors(router *chi.Mux) {
 	router.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"https://*", "http://*"},
@@ -55,7 +58,8 @@ func main() {
 
 	config.serverPort = os.Getenv("PORT")
 	config.dbUrl = os.Getenv("DB_URL")
-	config.maxThreads = 16
+	config.scrapeMaxThreads = 12
+	config.scrapeDelay = time.Minute
 
 	conn, err := sql.Open("postgres", config.dbUrl)
 	if err != nil {
@@ -64,7 +68,7 @@ func main() {
 
 	config.DB = database.New(conn)
 
-	go scrape(config.DB, config.maxThreads, time.Minute)
+	go scrape(config.DB, config.scrapeMaxThreads, time.Minute)
 
 	router := chi.NewRouter()
 	setupCors(router)
