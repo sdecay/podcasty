@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
@@ -16,6 +17,7 @@ import (
 type apiConfig struct {
 	DB         *database.Queries
 	serverPort string
+	maxThreads int
 	dbUrl      string
 }
 
@@ -53,6 +55,7 @@ func main() {
 
 	config.serverPort = os.Getenv("PORT")
 	config.dbUrl = os.Getenv("DB_URL")
+	config.maxThreads = 16
 
 	conn, err := sql.Open("postgres", config.dbUrl)
 	if err != nil {
@@ -60,6 +63,8 @@ func main() {
 	}
 
 	config.DB = database.New(conn)
+
+	go scrape(config.DB, config.maxThreads, time.Minute)
 
 	router := chi.NewRouter()
 	setupCors(router)
