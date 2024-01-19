@@ -5,3 +5,10 @@ returning *;
 
 -- name: GetPostUniques :many
 select url from posts;
+
+-- name: GetUsersPosts :many
+select posts.* from posts
+join follows on posts.feed_id = follows.feed_id
+where follows.user_id=$1
+order by posts.published_at desc
+limit $2;

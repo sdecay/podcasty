@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -42,13 +43,6 @@ func setupCors(router *chi.Mux) {
 
 // TODO: break it up at some point.  too much shit in here
 func main() {
-	// testes testes 1, 2... 3?
-	// feed, err := UrlToRssFeed("https://www.sevatimassage.com/blog?format=rss")
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// fmt.Println(feed)
-
 	config := apiConfig{}
 
 	err := loadEnvironment()
@@ -58,8 +52,9 @@ func main() {
 
 	config.serverPort = os.Getenv("PORT")
 	config.dbUrl = os.Getenv("DB_URL")
-	config.scrapeMaxThreads = 12
-	config.scrapeDelay = time.Minute
+	config.scrapeMaxThreads, _ = strconv.Atoi(os.Getenv("SCRAPE_MAX_THREADS"))
+	scrapeDelay, _ := strconv.Atoi(os.Getenv("SCRAPE_DELAY")) // ugh
+	config.scrapeDelay = time.Second * time.Duration(scrapeDelay)
 
 	conn, err := sql.Open("postgres", config.dbUrl)
 	if err != nil {
@@ -68,7 +63,7 @@ func main() {
 
 	config.DB = database.New(conn)
 
-	go scrape(config.DB, config.scrapeMaxThreads, time.Minute)
+	go scrape(config.DB, config.scrapeMaxThreads, config.scrapeDelay)
 
 	router := chi.NewRouter()
 	setupCors(router)
@@ -86,6 +81,8 @@ func main() {
 	v1Router.Post("/follow", config.middlewareAuth(config.handlerFollowFeed))
 	v1Router.Get("/follow", config.middlewareAuth(config.handlerGetFollowed))
 	v1Router.Delete("/follow/{followID}", config.middlewareAuth(config.handlerDeleteFollow))
+
+	v1Router.Get("/latest", config.middlewareAuth(config.handlerGetUsersPosts))
 
 	router.Mount("/v1", v1Router)
 

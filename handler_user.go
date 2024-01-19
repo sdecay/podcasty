@@ -41,3 +41,16 @@ func (config *apiConfig) handlerCreateUser(writer http.ResponseWriter, req *http
 func (config *apiConfig) handlerGetUser(writer http.ResponseWriter, req *http.Request, user database.User) {
 	respondWithJson(writer, http.StatusOK, dbUserToUser(user))
 }
+
+func (config *apiConfig) handlerGetUsersPosts(writer http.ResponseWriter, req *http.Request, user database.User) {
+	posts, err := config.DB.GetUsersPosts(req.Context(), database.GetUsersPostsParams{
+		UserID: user.ID,
+		Limit:  10,
+	})
+	if err != nil {
+		respondWithError(writer, http.StatusBadRequest, fmt.Sprintf("could not get your latest posts: %s", err))
+		return
+	}
+
+	respondWithJson(writer, http.StatusOK, dbPostsToPosts(posts))
+}

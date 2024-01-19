@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"log"
 	"sync"
 	"time"
@@ -38,7 +37,8 @@ func scrape(db *database.Queries, threads int, delay time.Duration) {
 }
 
 func scrapeFeed(db *database.Queries, wtGrp *sync.WaitGroup, feed database.Feed, existing map[string]bool) {
-	fmt.Println("scraping feed:", feed.Name)
+	log.Println("scraping feed:", feed.Name)
+
 	defer wtGrp.Done()
 
 	_, err := db.MarkFetched(context.Background(), feed.ID)
@@ -60,7 +60,7 @@ func scrapeFeed(db *database.Queries, wtGrp *sync.WaitGroup, feed database.Feed,
 
 		description, pubTime := normalizePostData(item.Description, item.PubDate)
 
-		fmt.Println(description, pubTime)
+		log.Println(description, pubTime)
 
 		_, err = db.CreatePost(context.Background(),
 			database.CreatePostParams{
@@ -85,7 +85,7 @@ func getExistingPosts(db *database.Queries) map[string]bool {
 	// probably not best to store this in memory at scale but hey
 	urls, err := db.GetPostUniques(context.Background())
 	if err != nil {
-		fmt.Println("problem fetching uniques uh oh!")
+		log.Println("problem fetching uniques uh oh!")
 	}
 	context.Background().Done() // this was just a dumb guess.  worked!
 
